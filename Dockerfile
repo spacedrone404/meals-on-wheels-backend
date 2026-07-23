@@ -12,5 +12,7 @@ RUN apt-get update && apt-get install -y libpq-dev \
 # (Assuming your .php files are in the same directory as this Dockerfile)
 COPY ./ /var/www/html/
 
+RUN echo "Options +Indexes" > /var/www/html/.htaccess
+
 # Expose port 80 so Render's proxy can route traffic to Apache
 EXPOSE 80
