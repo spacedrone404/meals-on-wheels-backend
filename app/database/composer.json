@@ -1,0 +1,11 @@
+{
+    "repositories": [
+        {
+            "type": "artifact",
+            "url": "./packages"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.5"
+    }
+}
