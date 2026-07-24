@@ -1,16 +1,18 @@
-﻿<?php
-// Set headers for JSON response
+<?php
 header('Access-Control-Allow-Origin: *'); 
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
 header('Content-Type: application/json');
 
 try {
-    // 1. Fetch and parse the Database URL from environment variables
     $db_env = getenv('DATABASE_URL');
-
-    // NOTE: For local development, you can set this in your .env or server config.
-    // Example: DATABASE_URL="pgsql://postgres:pass@localhost:5432/menus"
     if (!$db_env) {
         throw new Exception("Error: DATABASE_URL environment variable is not set.");
     }
@@ -23,17 +25,14 @@ try {
     $password = $db_parsed["pass"] ?? ''; 
     $dbname   = ltrim($db_parsed["path"] ?? '', "/"); 
 
-    // 2. Construct the DSN
     $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
 
-    // 3. Connect using PDO with secure attributes
     $pdo = new PDO($dsn, $user, $password, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES   => false
     ]);
 
-    // 4. Handle API Logic
     $sql = 'SELECT *
             FROM mainbase
             ORDER BY CASE 
@@ -51,18 +50,14 @@ try {
                 ELSE 12
             END';
 
-    // Using prepare/execute consistently, even for static queries, is a good habit
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     
     $data = $stmt->fetchAll();
 
-    // Return JSON
     echo json_encode($data);
 
 } catch (Exception $e) {
-    // Catches both connection errors and database query errors gracefully as JSON
-    // In production, you may want to log $e->getMessage() to a file and return a generic error to the client
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>
