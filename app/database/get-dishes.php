@@ -25,7 +25,7 @@ try {
     $password = $db_parsed["pass"] ?? ''; 
     $dbname   = ltrim($db_parsed["path"] ?? '', "/"); 
 
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname;client_encoding=UTF8";
 
     $pdo = new PDO($dsn, $user, $password, [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -34,7 +34,7 @@ try {
     ]);
 
     $pdo->exec("SET client_encoding TO 'UTF8'");
-    
+
     $sql = 'SELECT *
             FROM mainbase
             ORDER BY CASE 
