@@ -33,6 +33,8 @@ try {
         PDO::ATTR_EMULATE_PREPARES   => false
     ]);
 
+    $pdo->exec("SET client_encoding TO 'UTF8'");
+    
     $sql = 'SELECT *
             FROM mainbase
             ORDER BY CASE 
