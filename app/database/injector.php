@@ -1,13 +1,8 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-$dsn = 'pgsql:host=localhost;port=5432;dbname=menus;user=postgres;password=DevDb4884_(_)#*';
 try {
-    $pdo = new PDO($dsn);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die(json_encode(['error' => 'Cant connect to the database: ' . $e->getMessage()]));
-}
+    require_once __DIR__ . '/../connection.php';
 
 // Get data from POST request
 $data = json_decode(file_get_contents('php://input'), true);
@@ -67,5 +62,12 @@ if ($stmt->execute()) {
 } else {
     http_response_code(500);
     echo json_encode(['error' => 'Cant save the data, error: ' . implode(', ', $stmt->errorInfo())]);
+}
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>
