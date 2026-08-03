@@ -1,16 +1,8 @@
 <?php
-
-$host = 'localhost';
-$db   = 'menus';
-$user = 'postgres';
-$pass = 'DevDb4884_(_)#*'; 
+header('Content-Type: application/json; charset=utf-8');
 
 try {
-    $pdo = new PDO("pgsql:host=$host;dbname=$db", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (\PDOException $e) {
-    die('Error connecting to the database: ' . $e->getMessage());
-}
+    require_once __DIR__ . '/../connection.php';
 
 // Handling post request
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -24,5 +16,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         echo json_encode(["success" => false, "message" => "Error during removal"]);
     }
+}
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>
