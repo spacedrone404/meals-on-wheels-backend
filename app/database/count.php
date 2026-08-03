@@ -4,6 +4,7 @@ header('Content-Type: application/json; charset=utf-8');
 try {
     require_once __DIR__ . '/../connection.php';
     
+	$pdo = getDbConnection();
     $sql = "SELECT COUNT(*) FROM mainbase";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -16,7 +17,7 @@ try {
     http_response_code(500);
     echo json_encode([
         'error' => true,
-        'message' => 'Ошибка при выборке данных из БД'
+        'message' => 'Error when selecting from DB'
     ], JSON_UNESCAPED_UNICODE);
 }
 ?>
