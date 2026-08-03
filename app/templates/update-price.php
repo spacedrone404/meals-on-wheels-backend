@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header('Content-Type: application/json');
 
 require dirname(__DIR__) . '../connection.php'; 

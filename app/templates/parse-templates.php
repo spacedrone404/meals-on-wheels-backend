@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Set headers for JSON response and CORS if needed
 header('Content-Type: application/json');
 

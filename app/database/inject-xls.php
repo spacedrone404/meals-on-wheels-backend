@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 // Save PHP w/o BOM encode
 // For the script to work, you need to install the dependency via: composer require phpoffice/phpspreadsheet

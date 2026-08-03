@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require dirname(__DIR__) . '../connection.php'; 
 
 //$host = 'localhost';

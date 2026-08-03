@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header('Content-Type: application/json');
 
 $dsn = 'pgsql:host=localhost;port=5432;dbname=menus;user=postgres;password=DevDb4884_(_)#*';
