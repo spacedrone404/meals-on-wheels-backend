@@ -28,8 +28,6 @@ try {
             echo json_encode(['error' => 'Incorrect template']);
             exit;
         }
-                
-        // Using $pdo instead of undefined $dbh
         $stmt = $pdo->prepare("SELECT id, code, name, description, weight, category, price FROM \"$template\" WHERE category = :category ORDER BY code ASC");
         $stmt->execute([':category' => $category]);
         
