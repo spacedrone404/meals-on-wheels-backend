@@ -1,9 +1,9 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+
+require_once __DIR__ . '/../connection.php';
 
 try {
-    require_once __DIR__ . '/../connection.php';
-
+    $pdo = getDbConnection();
 // Handling post request
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $code = $_POST['code'];
