@@ -1,16 +1,13 @@
 <?php
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';
-$password = 'DevDb4884_(_)#*';
 
 // Takes the values of the menudata and signatures fields from the database according to the template name
+require_once __DIR__ . '/../connection.php';
 
 try {
-    $dbh = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+    $pdo = getDbConnection();
     if (isset($_GET['template'])) {
         $template = $_GET['template'];
-        $stmt = $dbh->prepare("SELECT menudata, signatures, menushow FROM settings WHERE menuname = :template");
+        $stmt = $pdo->prepare("SELECT menudata, signatures, menushow FROM settings WHERE menuname = :template");
         $stmt->execute([':template' => $template]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
@@ -22,7 +19,11 @@ try {
     } else {
         echo json_encode(['error' => 'Missing template parameter']);
     }
-} catch (PDOException $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

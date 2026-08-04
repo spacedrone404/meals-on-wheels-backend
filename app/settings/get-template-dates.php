@@ -1,15 +1,9 @@
 <?php
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres'; 
-$password = 'DevDb4884_(_)#*';     
-
 // Parses all template data from the settings table
-
+require_once __DIR__ . '/../connection.php';
 
 try {
-    $dbh = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-    
+    $pdo = getDbConnection();
     // Reading raw JSON from the requested body
     $jsonData = file_get_contents('php://input');
     $data = json_decode($jsonData, true);
@@ -19,7 +13,7 @@ try {
         $templates = $data['templates'];
         $dates = [];
         foreach ($templates as $template) {
-            $stmt = $dbh->prepare("SELECT menudata, menushow FROM settings WHERE menuname = :template");
+            $stmt = $pdo->prepare("SELECT menudata, menushow FROM settings WHERE menuname = :template");
             $stmt->execute([':template' => $template]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $dates[$template] = $result ? ['date' => $result['menudata'], 'show' => (bool)$result['menushow']] : ['date' => null, 'show' => false];
@@ -30,8 +24,11 @@ try {
         // If 'templates' are missing or invalid
         echo json_encode(['error' => 'No templates were provided or invalid format']);
     }
-} catch (PDOException $e) {
-
-    echo json_encode(['error' => $e->getMessage()]);
+	} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

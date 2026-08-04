@@ -6,30 +6,17 @@
 
 // Increasing memory limit
 ini_set('memory_limit', '2048M');
- 
+
 require 'vendor/autoload.php';
+require_once __DIR__ . '/../connection.php';
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\IReader;
 
-
 $inputFileName = __DIR__ . '/2base.xlsx'; 
 
-$dbHost = 'localhost';
-$dbPort = '5432';
-$dbName = 'menus';
-$dbUser = 'postgres';     
-$dbPass = 'DevDb4884_(_)#*'; 
-
 try {
-    $pdo = new PDO(
-        "pgsql:host={$dbHost};port={$dbPort};dbname={$dbName}",
-        $dbUser,
-        $dbPass
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error connecting to the database: " . $e->getMessage() . PHP_EOL);
-}
+    $pdo = getDbConnection();
 
 // Loading xls files through a reader for optimization and more efficient memory usage
 
@@ -161,5 +148,11 @@ foreach ($spreadsheet->getAllSheets() as $sheet) {
 echo "<br />";
 echo "Number of successfully imported items: {$imported} <br />";
 echo "Take a pie from the shelf! <br />";
-
+	} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
+}
 ?>

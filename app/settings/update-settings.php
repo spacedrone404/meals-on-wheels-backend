@@ -1,30 +1,24 @@
 <?php
-header('Content-Type: application/json');
-
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';
-$password = 'DevDb4884_(_)#*'; 
-
 // Adds a new date to the template when the Save button is clicked.
+require_once __DIR__ . '/../connection.php';
 
 try {
-    $dbh = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+    $pdo = getDbConnection();
     $input = json_decode(file_get_contents('php://input'), true);
 
     if (isset($input['template']) && isset($input['date'])) {
         $template = $input['template'];
         $date = $input['date'];
         
-        $stmt = $dbh->prepare("SELECT id FROM settings WHERE menuname = :template");
+        $stmt = $pdo->prepare("SELECT id FROM settings WHERE menuname = :template");
         $stmt->execute([':template' => $template]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) { // Record exists
-            $stmt = $dbh->prepare("UPDATE settings SET menudata = :date WHERE menuname = :template");
+            $stmt = $pdo->prepare("UPDATE settings SET menudata = :date WHERE menuname = :template");
             $stmt->execute([':date' => $date, ':template' => $template]);
         } else { // No record
-            $stmt = $dbh->prepare("INSERT INTO settings (menuname, menudata) VALUES (:template, :date)");
+            $stmt = $pdo->prepare("INSERT INTO settings (menuname, menudata) VALUES (:template, :date)");
             $stmt->execute([':template' => $template, ':date' => $date]);
         }
 
@@ -33,8 +27,11 @@ try {
         http_response_code(400); 
         echo json_encode(['error' => 'Template or date parameters were not passed.']); 
     }
-} catch (PDOException $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]); 
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

@@ -1,10 +1,8 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../connection.php';
 
 try {
-    require_once __DIR__ . '/../connection.php';
-    
-	$pdo = getDbConnection();
+    $pdo = getDbConnection();
     $sql = "SELECT COUNT(*) FROM mainbase";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();

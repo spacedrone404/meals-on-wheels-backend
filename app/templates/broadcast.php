@@ -1,16 +1,8 @@
 <?php
-
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';
-$password = 'DevDb4884_(_)#*';
-
-header('Content-Type: application/json');
+require_once __DIR__ . '/../connection.php';
 
 try {
-
-    $pdo = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-   
+    $pdo = getDbConnection();
     $requestMenuName = isset($_GET['menuname']) ? $_GET['menuname'] : null;
 
     // Define the operation: status update / get current status
@@ -36,8 +28,11 @@ try {
             'active_menu' => $active_menu,
         ]);
     }
-
-} catch (PDOException $e) {
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

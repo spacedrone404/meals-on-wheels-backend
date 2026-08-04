@@ -1,10 +1,9 @@
 <?php
-header('Content-Type: application/json');
-
-require dirname(__DIR__) . '../connection.php'; 
+require_once __DIR__ . '/../connection.php';
 
 try {
-    
+    $pdo = getDbConnection();
+
     $input = file_get_contents('php://input');
     $params = json_decode($input, true);
     
@@ -49,8 +48,11 @@ try {
         throw new Exception('Error changing the price');
     }
     echo json_encode(['status' => 'ok']); 
-} catch (Exception $e) {
-    http_response_code(500); 
-    echo json_encode(['error' => $e->getMessage()]); 
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

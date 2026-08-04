@@ -1,14 +1,8 @@
 <?php
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';
-$password = 'DevDb4884_(_)#*';
-
-header('Content-Type: application/json');
+require_once __DIR__ . '/../connection.php';
 
 try {
-    $dbh = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-
+    $pdo = getDbConnection();
     // Getting JSON from POST request
     $input = json_decode(file_get_contents('php://input'), true);
 
@@ -21,7 +15,7 @@ try {
 
             $table = $templateName;
 
-            $stmt = $dbh->prepare("DELETE FROM \"$table\" WHERE code = :code");
+            $stmt = $pdo->prepare("DELETE FROM \"$table\" WHERE code = :code");
             $stmt->bindParam(':code', $code);
 
             if ($stmt->execute()) {
@@ -41,10 +35,11 @@ try {
             'message' => 'Required data is missing'
         ]);
     }
-} catch (PDOException | Exception $e) {
+} catch (\Throwable $e) {
+    http_response_code(500);
     echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ]);
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

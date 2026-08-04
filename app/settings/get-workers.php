@@ -1,19 +1,12 @@
 <?php
-
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';  
-$password = 'DevDb4884_(_)#*';     
-
-
 // Takes the value of the signatures fields from the database according to the template name
+require_once __DIR__ . '/../connection.php';
 
 try {
-
-    $dbh = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
+    $pdo = getDbConnection();
     
     // Request for non-empty names of signatories
-    $stmt = $dbh->prepare("SELECT DISTINCT signatures FROM settings WHERE signatures IS NOT NULL AND signatures != '' ORDER BY signatures ASC");
+    $stmt = $pdo->prepare("SELECT DISTINCT signatures FROM settings WHERE signatures IS NOT NULL AND signatures != '' ORDER BY signatures ASC");
     $stmt->execute();
     
     // Query all signatories as a single-column array
@@ -21,8 +14,11 @@ try {
     
     // Returning a list of signers in JSON
     echo json_encode($workers);
-} catch (PDOException $e) {
-    
-    echo json_encode(['error' => $e->getMessage()]);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

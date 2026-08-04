@@ -1,13 +1,8 @@
 <?php
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';
-$password = 'DevDb4884_(_)#*';
-
+require_once __DIR__ . '/../connection.php';
 
 try {
-    $pdo = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = getDbConnection();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -40,7 +35,11 @@ try {
     } else {
         echo json_encode(['error' => 'Incorrect request']);
     }
-} catch (PDOException $e) {
-    echo json_encode(['error' => 'Error during processing: ' . $e->getMessage()]);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

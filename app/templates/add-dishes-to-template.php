@@ -1,9 +1,8 @@
 <?php
-$host = 'localhost';
-$dbname = 'menus';
-$user = 'postgres';
-$password = 'DevDb4884_(_)#*';
+require_once __DIR__ . '/../connection.php';
 
+try {
+    $pdo = getDbConnection();
 
 $validTemplates = [
     'template_dinner_1', 'template_dinner_2', 'template_dinner_3', 'template_dinner_4', 'template_dinner_5',
@@ -12,13 +11,6 @@ $validTemplates = [
 ];
 
 
-try {
-    $pdo = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
-    exit;
-}
 
 // Getting input from a query
 $data = json_decode(file_get_contents('php://input'), true);
@@ -80,5 +72,12 @@ if ($successCount > 0 || !empty($skipped)) {
     echo json_encode(['success' => true, 'added' => $successCount, 'skipped' => $skipped, 'errors' => $errors]);
 } else {
     echo json_encode(['success' => false, 'errors' => $errors]);
+}
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

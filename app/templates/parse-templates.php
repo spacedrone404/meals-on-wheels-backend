@@ -1,34 +1,10 @@
 <?php
-// Set headers for JSON response and CORS if needed
-header('Content-Type: application/json');
+require_once __DIR__ . '/../connection.php';
 
 try {
-    // 1. Fetch and parse the Internal Database URL from Render's environment
-    $db_env = getenv('DATABASE_URL');
+    $pdo = getDbConnection();
 
-    if (!$db_env) {
-        throw new Exception("Error: DATABASE_URL environment variable is not set.");
-    }
-
-    $db_parsed = parse_url($db_env);
-
-    $host = $db_parsed["host"];
-    $port = $db_parsed["port"] ?? 5432;
-    $user = $db_parsed["user"];
-    $password = $db_parsed["pass"];
-    $dbname = ltrim($db_parsed["path"], "/"); 
-
-    // 2. Construct the DSN
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
-
-    // 3. Connect using PDO (using $pdo consistently)
-    $pdo = new PDO($dsn, $user, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false
-    ]);
-
-    // 4. Handle API Logic
+    // Handle API Logic
     if (!empty($_GET['category']) && !empty($_GET['template'])) {
         $category = $_GET['category'];
         $template = $_GET['template'];
@@ -64,8 +40,11 @@ try {
         echo json_encode(['error' => 'Missing parameters']);
     }
 
-} catch (Exception $e) {
-    // Catches both connection errors and database query errors gracefully as JSON
-    echo json_encode(['error' => $e->getMessage()]);
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => true,
+        'message' => 'Error when selecting from DB'
+    ], JSON_UNESCAPED_UNICODE);
 }
 ?>

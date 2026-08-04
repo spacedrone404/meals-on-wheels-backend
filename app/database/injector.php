@@ -1,8 +1,8 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../connection.php';
 
 try {
-    require_once __DIR__ . '/../connection.php';
+    $pdo = getDbConnection();
 
 // Get data from POST request
 $data = json_decode(file_get_contents('php://input'), true);
